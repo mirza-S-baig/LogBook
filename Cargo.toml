@@ -2,6 +2,8 @@
 name = "logbook"
 version = "0.1.0"
 edition = "2024"
+description = "A lightweight, offline-first Todo CLI"
+repository = "https://github.com/mirza-S-baig/LogBook"
 
 [dependencies]
 clap = { version = "4.6.7", features = ["derive"] }
