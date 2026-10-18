@@ -1,0 +1,72 @@
+
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+          - os: macos-15-intel
+            target: x86_64-apple-darwin
+          - os: macos-15
+            target: aarch64-apple-darwin
+
+    steps:
+      - name: Get source code
+        uses: actions/checkout@v6
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Test
+        run: cargo test --target ${{ matrix.target }}
+
+      - name: Package executable
+        run: |
+          mkdir -p dist
+          tar -czf dist/lg-${{ matrix.target }}.tar.gz \
+            -C target/${{ matrix.target }}/release lg
+
+      - name: Upload build
+        uses: actions/upload-artifact@v4
+        with:
+          name: lg-${{ matrix.target }}
+          path: dist/*.tar.gz
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all builds
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          pattern: lg-*
+          merge-multiple: true
+
+      - name: Publish release assets
+        uses: softprops/action-gh-release@v3
+        with:
+          files: dist/*.tar.gz
