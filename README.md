@@ -78,6 +78,11 @@ Once published to Homebrew, the intended installation command will be:
 ```bash
 brew install logbook
 ```
+For now you can use tap hombrew :
+
+```bash
+brew install mirza-S-baig/tap/logbook
+```
 
 Then start managing tasks with:
 
