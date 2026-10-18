@@ -1,0 +1,19 @@
+# Rust build artifacts
+/target
+
+# Local SQLite databases
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Environment variables and secrets
+.env
+.env.*
+
+# macOS files
+.DS_Store
+
+# Editor settings
+.vscode/
+.idea/
